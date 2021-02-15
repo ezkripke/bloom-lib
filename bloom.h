@@ -170,4 +170,4 @@ void MurmurHash3_x64_128 ( const void * key, const int len,
 }
 #endif
 
-#endif // _MURMURHASH3_H_
+#endif // _BLOOM_H_
