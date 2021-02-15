@@ -1,5 +1,5 @@
 	BloomFilter bf;
-	bloom_init(&bf, 50, 0.05);
+	bloom_init(&bf, /*expected total number of entries = */ 50, /* desired false positive rate = */ 0.05);
 	for (int i = 0; i < 100; i+=2) {
 		bloom_update(&bf, i);
 	}
