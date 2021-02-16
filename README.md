@@ -1,7 +1,16 @@
+## bloom-lib
+Header-only bloom filter library for C/C++.
+
+Initialize Bloom Filter with total expected number of entries and desired false positive rate:
+
 	BloomFilter bf;
-	bloom_init(&bf, /*expected total number of entries = */ 50, /* desired false positive rate = */ 0.05);
-	for (int i = 0; i < 100; i+=2) {
-		bloom_update(&bf, i);
-	}
-	bool b1 = bloom_contains(&bf, 17); // 100% chance that b1 == false
-	bool b2 = bloom_contains(&bf, 8); // 95% chance that b2 == true
+	bloom_init(&bf, 50, 0.05);
+	
+Add int to filter:
+
+	bloom_update(&bf, 5);
+	
+Check if int is (probably) in filter
+	
+	bool b1 = bloom_contains(&bf, 11); // 100% chance that b1 == false
+	bool b2 = bloom_contains(&bf, 5);  // 95% chance that b2 == true
