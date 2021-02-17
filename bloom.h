@@ -15,18 +15,20 @@ void MurmurHash3_x64_128(const void *key, const int len, const uint32_t seed,
 
 typedef struct {
   double bpe;
-  int num_hashes;
+  uint32_t num_hashes;
   uint32_t len_fp;
-  char *fp;
+  uint8_t *fp;
 } BloomFilter;
 
 void bloom_init(BloomFilter *bf, uint64_t num_entries, double fpr) {
   bf->bpe = -log2(fpr) / log(2);
-  bf->num_hashes = (int)ceil(bf->bpe * log(2));
-  bf->len_fp = (int)ceil(bf->bpe * num_entries);
-  bf->fp =
-      (char *)malloc((bf->len_fp / 8 + (bf->len_fp % 8 != 0)) * sizeof(char));
+  bf->num_hashes = (uint32_t)ceil(bf->bpe * log(2));
+  bf->len_fp = (uint32_t)ceil(bf->bpe * num_entries);
+  bf->fp = (uint8_t *)malloc((bf->len_fp / 8 + (bf->len_fp % 8 != 0)) *
+                             sizeof(uint8_t));
 }
+
+void bloom_done(BloomFilter *bf) { free(bf->fp); }
 
 void bloom_update(BloomFilter *bf, int key) {
   for (int i = 0; i < bf->num_hashes; i++) {
