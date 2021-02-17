@@ -2,7 +2,6 @@
 #define _BLOOM_H_
 
 #include <math.h>
-#include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -18,33 +17,36 @@ typedef struct {
   double bpe;
   int num_hashes;
   uint32_t len_fp;
-  bool *fp;
+  char *fp;
 } BloomFilter;
 
 void bloom_init(BloomFilter *bf, uint64_t num_entries, double fpr) {
   bf->bpe = -log2(fpr) / log(2);
   bf->num_hashes = (int)ceil(bf->bpe * log(2));
   bf->len_fp = (int)ceil(bf->bpe * num_entries);
-  bf->fp = (bool *)malloc(bf->len_fp * sizeof(bool));
+  bf->fp =
+      (char *)malloc((bf->len_fp / 8 + (bf->len_fp % 8 != 0)) * sizeof(char));
 }
 
 void bloom_update(BloomFilter *bf, int key) {
   for (int i = 0; i < bf->num_hashes; i++) {
     uint64_t hash_val[2];
     MurmurHash3_x64_128(&key, sizeof(int), SEED, &hash_val);
-    bf->fp[(hash_val[0] + i * hash_val[1]) % bf->len_fp] = true;
+    int n = (hash_val[0] + i * hash_val[1]) % bf->len_fp;
+    bf->fp[n / 8] |= 1UL << (7 - (n % 8));
   }
 }
 
-bool bloom_contains(BloomFilter *bf, int key) {
+int bloom_contains(BloomFilter *bf, int key) {
   for (int i = 0; i < bf->num_hashes; i++) {
     uint64_t hash_val[2];
     MurmurHash3_x64_128(&key, sizeof(int), SEED, &hash_val);
-    if (!bf->fp[(hash_val[0] + i * hash_val[1]) % bf->len_fp]) {
-      return false;
+    int n = (hash_val[0] + i * hash_val[1]) % bf->len_fp;
+    if (!(bf->fp[n / 8] & 1UL << (7 - (n % 8)))) {
+      return 0;
     }
   }
-  return true;
+  return 1;
 }
 
 //-----------------------------------------------------------------------------
