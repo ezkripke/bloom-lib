@@ -1,5 +1,5 @@
 ## bloom-lib
-Header-only bloom filter library for C/C++.
+Header-only bloom filter library for C/C++ (64-bit machines).
 
 Initialize Bloom Filter with total expected number of entries and desired false positive rate:
 
